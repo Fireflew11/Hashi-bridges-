@@ -8,6 +8,7 @@ public class BoardGenerator
     private HashSet<(int x, int y)> unavailablePositions = new HashSet<(int x, int y)>();
     private HashSet<(int x, int y)> nearIslandsUnavailable = new HashSet<(int x, int y)>();
 
+
     public HashiBoard GenerateSolvableBoard(int width, int height)
     {
         HashiBoard board = CreateBoard(width, height);
