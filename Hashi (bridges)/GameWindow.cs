@@ -300,12 +300,8 @@ namespace Hashi__bridges_
             int cellHeight = grid.Height / grid.RowCount;
 
             // Calculate the actual pixel positions of the start and end points within the grid
-            Point startPosition = new Point(start.X * cellWidth, start.Y * cellHeight);
-            Point endPosition = new Point(end.X * cellWidth, end.Y * cellHeight);
-
-            // Calculate separator adjustment (if needed)
-            int separatorAdjustmentX = (start.X == end.X) ? 0 : SeparatorThickness * start.Y;
-            int separatorAdjustmentY = (start.Y == end.Y) ? 0 : SeparatorThickness * start.X;
+            Point startPosition = new Point(start.X * (cellWidth + SeparatorThickness), start.Y * (cellHeight + SeparatorThickness));
+            Point endPosition = new Point(end.X * (cellWidth + SeparatorThickness), end.Y * (cellHeight + SeparatorThickness));
 
             // Create the consistent tag for the panel using CreateTag
             string tag = CreateTag(start, end);
@@ -314,11 +310,11 @@ namespace Hashi__bridges_
             Panel bridgePanel = new Panel
             {
                 BackColor = Color.Black, // Bridge color
-                Width = (start.X == end.X) ? 5 : Math.Abs(endPosition.X - startPosition.X) + separatorAdjustmentX, // Horizontal or vertical width
-                Height = (start.Y == end.Y) ? 5 : Math.Abs(endPosition.Y - startPosition.Y) + separatorAdjustmentY, // Horizontal or vertical height
+                Width = (start.X == end.X) ? 5 : Math.Abs(endPosition.X - startPosition.X), // Horizontal or vertical width
+                Height = (start.Y == end.Y) ? 5 : Math.Abs(endPosition.Y - startPosition.Y), // Horizontal or vertical height
                 Location = new Point(
-                    Math.Min(startPosition.X, endPosition.X) + (cellWidth / 2) - 2,
-                    Math.Min(startPosition.Y, endPosition.Y) + (cellHeight / 2) - 2
+                    Math.Min(startPosition.X, endPosition.X) + (cellWidth / 2) - SeparatorThickness / 2,
+                    Math.Min(startPosition.Y, endPosition.Y) + (cellHeight / 2) - SeparatorThickness / 2
                 ), // Adjust the panel's position to center it between the islands, accounting for separators
                 Tag = tag // Use CreateTag to create the tag with start and end coordinates
             };
@@ -342,10 +338,6 @@ namespace Hashi__bridges_
             Controls.Add(bridgePanel);
             bridgePanel.BringToFront(); // Ensure the bridge is drawn on top of the grid
         }
-
-
-
-
 
 
         // Remove the bridge between two islands
