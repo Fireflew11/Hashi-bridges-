@@ -8,7 +8,6 @@ public class BoardGenerator
     private HashSet<(int x, int y)> unavailablePositions = new HashSet<(int x, int y)>();
     private HashSet<(int x, int y)> nearIslandsUnavailable = new HashSet<(int x, int y)>();
 
-
     public HashiBoard GenerateSolvableBoard(int width, int height)
     {
         HashiBoard board = CreateBoard(width, height);
@@ -21,8 +20,7 @@ public class BoardGenerator
     private HashiBoard CreateBoard(int width, int height)
     {
         HashiBoard board = new HashiBoard(width, height);
-        List<Island> islands = new List<Island>();
-        int currentIslandIndex = 0;
+        HashSet<Island> islands = new HashSet<Island>();
         int firstIslandX = rand.Next(0, width);
         int firstIslandY = rand.Next(0, height);
         Island first = new Island(firstIslandX, firstIslandY, 0);
@@ -34,24 +32,24 @@ public class BoardGenerator
         unavailablePositions.Add((firstIslandX, firstIslandY));
         islands.Add(first);
         board.AddIsland(first);
-        bool finished = false;
+        int unsuccesfulAttempts = 0;
 
-        while (!finished)
+        while (islands.Count <= width * height / 3)
         {
-            BuildIslands(board, islands, islands[currentIslandIndex], width, height);
+            Island randIsland = islands.ElementAt(rand.Next(0, islands.Count));
+            BuildIslands(board, islands, randIsland, width, height, ref unsuccesfulAttempts);
 
-            foreach (var connection in islands[currentIslandIndex].Connections)
+            if(unsuccesfulAttempts == 200)
             {
-                islands[currentIslandIndex].BridgesNeeded += connection.BridgeCount;
+                break;
             }
+        }
 
-            if (islands.Count == currentIslandIndex + 1)
+        foreach (var island in board.Islands)
+        {
+            foreach(var connection in island.Connections)
             {
-                finished = true;
-            }
-            else
-            {
-                currentIslandIndex++;
+                island.BridgesNeeded += connection.BridgeCount;
             }
         }
 
@@ -64,44 +62,45 @@ public class BoardGenerator
         return board;
     }
 
-    private void BuildIslands(HashiBoard board, List<Island> islands, Island curIsland, int width, int height)
+    private void BuildIslands(HashiBoard board, HashSet<Island> islands, Island curIsland, int width, int height, ref int unsuccessfulAttempts)
     {
         var directions = new List<(int, int)> { (1, 0), (-1, 0), (0, 1), (0, -1) };
-        foreach (var direction in directions)
+        var direction = directions[rand.Next(0, 4)];
+        int newX = curIsland.X + direction.Item1 * rand.Next(2, 5);
+        int newY = curIsland.Y + direction.Item2 * rand.Next(2, 5);
+        fixOverTheMapToEdge(newX, width);
+        fixOverTheMapToEdge(newY, height);
+
+        if (unavailablePositions.Contains((newX, newY)) || newX < 0 || newX >= width || newY < 0 || newY >= height)
         {
-            int newX = curIsland.X + direction.Item1 * rand.Next(2, 5);
-            int newY = curIsland.Y + direction.Item2 * rand.Next(2, 5);
-            fixOverTheMapToEdge(newX, width);
-            fixOverTheMapToEdge(newY, height);
-
-            if (unavailablePositions.Contains((newX, newY)) || newX < 0 || newX >= width || newY < 0 || newY >= height)
-            {
-                continue;
-            }
-            else if (IsCrossing(direction, curIsland, (newX, newY)))
-            {
-                continue;
-            }
-            else if (nearIslandsUnavailable.Contains((newX, newY)))
-            {
-                continue;
-            }
-
-            Island newIsland = new Island(newX, newY, 0);
-            int numberOfConnections = rand.Next(1, 3);
-            curIsland.AddConnection(newIsland, numberOfConnections);
-            board.AddIsland(newIsland);
-            islands.Add(newIsland);
-            nearIslandsUnavailable.Add((newX, newY));
-            nearIslandsUnavailable.Add((newX + 1, newY));
-            nearIslandsUnavailable.Add((newX - 1, newY));
-            nearIslandsUnavailable.Add((newX, newY + 1));
-            nearIslandsUnavailable.Add((newX, newY - 1));
-            unavailablePositions.Add((newX, newY));
-            // Add all the points from the current island to the new island to the unavailable positions
-            
-            AddConnectionsToUnavailablePositions(curIsland);
+            unsuccessfulAttempts++;
+            return;
         }
+        else if (IsCrossing(direction, curIsland, (newX, newY)))
+        {
+            unsuccessfulAttempts++;
+            return;
+        }
+        else if (nearIslandsUnavailable.Contains((newX, newY)))
+        {
+            unsuccessfulAttempts++;
+            return;
+        }
+
+        Island newIsland = new Island(newX, newY, 0);
+        int numberOfConnections = rand.Next(1, 3);
+        curIsland.AddConnection(newIsland, numberOfConnections);
+        board.AddIsland(newIsland);
+        islands.Add(newIsland);
+        nearIslandsUnavailable.Add((newX, newY));
+        nearIslandsUnavailable.Add((newX + 1, newY));
+        nearIslandsUnavailable.Add((newX - 1, newY));
+        nearIslandsUnavailable.Add((newX, newY + 1));
+        nearIslandsUnavailable.Add((newX, newY - 1));
+        unavailablePositions.Add((newX, newY));
+        // Add all the points from the current island to the new island to the unavailable positions
+        unsuccessfulAttempts = 0;
+        AddConnectionsToUnavailablePositions(curIsland);
 
     }
 

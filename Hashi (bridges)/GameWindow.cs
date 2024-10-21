@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -149,6 +150,28 @@ namespace Hashi__bridges_
                     Location = new Point(islandX, islandY), // Set the island at the exact grid position
                     Tag = island // Store the island data for easy access
                 };
+
+                // Make the label a circle by setting its region
+                GraphicsPath circlePath = new GraphicsPath();
+                circlePath.AddEllipse(0, 0, islandLabel.Width, islandLabel.Height);
+                islandLabel.Region = new Region(circlePath);
+
+                // Handle the label's Paint event to draw the text centered in the circle
+                islandLabel.Paint += (sender, e) =>
+                {
+                    Label lbl = sender as Label;
+                    e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                    // Draw the circular border
+                    using (Pen pen = new Pen(Color.Black, 2))
+                    {
+                        e.Graphics.DrawEllipse(pen, 0, 0, lbl.Width - 1, lbl.Height - 1);
+                    }
+
+                    // Draw the text in the center of the circle
+                    TextRenderer.DrawText(e.Graphics, lbl.Text, lbl.Font, lbl.ClientRectangle, lbl.ForeColor, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+                };
+
 
                 // Add click event handler for selecting islands
                 islandLabel.Click += Island_Click;
