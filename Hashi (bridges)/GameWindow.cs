@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace Hashi__bridges_
 {
@@ -15,6 +16,9 @@ namespace Hashi__bridges_
         private HashiBoard board;
         private TableLayoutPanel grid; // Keep the grid for layout
         private List<Label> islandLabels = new List<Label>(); // Separate list for island labels
+        private Timer timer;
+        private Label stopwatchLabel;
+        private Stopwatch stopwatch;
 
         // Track the first and second selected islands
         private Island firstSelectedIsland;
@@ -40,8 +44,44 @@ namespace Hashi__bridges_
             CreateIslands();
 
             // Add reset button
+            InitializeStopwatchLabel();
             AddResetButton();
+
+            stopwatch = new Stopwatch();
+            stopwatch.Start();
+
+            InitializeTimer();
         }
+
+        private void InitializeTimer()
+        {
+            timer = new Timer();
+            timer.Interval = 1000; // 1 second intervals
+            timer.Tick += Timer_Tick;
+            timer.Start();
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            if (stopwatch.IsRunning)
+            {
+                TimeSpan timeTaken = stopwatch.Elapsed;
+                stopwatchLabel.Text = $"Time: {timeTaken.Hours:D2}:{timeTaken.Minutes:D2}:{timeTaken.Seconds:D2}";
+            }
+        }
+
+        private void InitializeStopwatchLabel()
+        {
+            stopwatchLabel = new Label();
+            stopwatchLabel.Location = new Point(100, this.ClientSize.Height - 40);
+            stopwatchLabel.AutoSize = true;
+
+            // Set a larger font size
+            stopwatchLabel.Font = new Font("Arial", 16, FontStyle.Bold); // Font size set to 16, bold for better visibility
+
+            this.Controls.Add(stopwatchLabel);
+        }
+
 
         private void AddResetButton()
         {
@@ -49,7 +89,7 @@ namespace Hashi__bridges_
             {
                 Text = "Reset",
                 Size = new Size(80, 30),
-                Location = new Point((this.ClientSize.Width - 80) / 2, this.ClientSize.Height - 40) // Center the button below the grid
+                Location = new Point((this.ClientSize.Width - 100), this.ClientSize.Height - 40) // Center the button below the grid
             };
 
             // Attach click event handler to reset the game
@@ -86,6 +126,9 @@ namespace Hashi__bridges_
             }
 
             board.ResetUnavailablePositions();
+
+            stopwatch.Reset();
+            stopwatch.Start();
         }
 
         private void AdjustWindowSize()
@@ -218,6 +261,7 @@ namespace Hashi__bridges_
 
             if(board.IsSolved())
             {
+                stopwatch.Stop();
                 MessageBox.Show("Congratulations! You have solved the puzzle!");
             }
         }
@@ -388,6 +432,14 @@ namespace Hashi__bridges_
                 if (connectedBridges < island.BridgesNeeded)
                 {
                     islandLabel.BackColor = Color.LightBlue; // Reset to blue for unfulfilled islands
+                }
+                else if(connectedBridges == island.BridgesNeeded)
+                {
+                    islandLabel.BackColor = Color.Green;
+                }
+                else if(connectedBridges > island.BridgesNeeded)
+                {
+                    islandLabel.BackColor = Color.Red;
                 }
             }
 
