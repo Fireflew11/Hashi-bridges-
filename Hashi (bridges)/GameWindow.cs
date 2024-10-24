@@ -10,6 +10,14 @@ namespace Hashi__bridges_
 {
     public partial class GameWindow : Form
     {
+        private Dictionary<(int width, int height), string> difficulties = new Dictionary<(int width, int height), string>
+        {
+            {(6, 9), "Easy"},
+            {(8, 12), "Medium"},
+            {(10, 15), "Hard"},
+            {(13, 18), "Heavy"},
+            {(15, 22), "Insane"}
+        };
         private int boardWidth;
         private int boardHeight;
         private BoardGenerator boardGenerator;
@@ -129,6 +137,7 @@ namespace Hashi__bridges_
 
             stopwatch.Reset();
             stopwatch.Start();
+
         }
 
         private void AdjustWindowSize()
@@ -263,6 +272,13 @@ namespace Hashi__bridges_
             {
                 stopwatch.Stop();
                 MessageBox.Show("Congratulations! You have solved the puzzle!");
+                stopwatch.Stop();
+                timer.Stop();
+                TimeSpan time = stopwatch.Elapsed;
+                timer.Start();
+
+                DatabaseManager dbManager = new DatabaseManager();
+                dbManager.InsertTimeScore("Player", (decimal)time.TotalSeconds, difficulties[(boardHeight, boardWidth)]);
             }
         }
 

@@ -34,6 +34,7 @@
             this.HardBtn = new System.Windows.Forms.Button();
             this.HeavyBtn = new System.Windows.Forms.Button();
             this.InsaneBtn = new System.Windows.Forms.Button();
+            this.HighScoresBtn = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // Header
@@ -98,11 +99,22 @@
             this.InsaneBtn.UseVisualStyleBackColor = true;
             this.InsaneBtn.Click += new System.EventHandler(this.InsaneBtn_Click);
             // 
+            // HighScoresBtn
+            // 
+            this.HighScoresBtn.Location = new System.Drawing.Point(274, 423);
+            this.HighScoresBtn.Name = "HighScoresBtn";
+            this.HighScoresBtn.Size = new System.Drawing.Size(101, 46);
+            this.HighScoresBtn.TabIndex = 6;
+            this.HighScoresBtn.Text = "High Scores";
+            this.HighScoresBtn.UseVisualStyleBackColor = true;
+            this.HighScoresBtn.Click += new System.EventHandler(this.HighScoresBtn_Click);
+            // 
             // form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(651, 540);
+            this.Controls.Add(this.HighScoresBtn);
             this.Controls.Add(this.InsaneBtn);
             this.Controls.Add(this.HeavyBtn);
             this.Controls.Add(this.HardBtn);
@@ -125,6 +137,7 @@
         private System.Windows.Forms.Button HardBtn;
         private System.Windows.Forms.Button HeavyBtn;
         private System.Windows.Forms.Button InsaneBtn;
+        private System.Windows.Forms.Button HighScoresBtn;
     }
 }
 

@@ -34,12 +34,12 @@ namespace Hashi__bridges_
         }
         private void MediumBtn_Click(object sender, EventArgs e)
         {
-            GameWindow gameWindow = new GameWindow(9, 12);
+            GameWindow gameWindow = new GameWindow(8, 12);
             gameWindow.Show();
         }
         private void HardBtn_Click(object sender, EventArgs e)
         {
-            GameWindow gameWindow = new GameWindow(12, 15);
+            GameWindow gameWindow = new GameWindow(10, 15);
             gameWindow.Show();
         }
         private void HeavyBtn_Click(object sender, EventArgs e)
@@ -52,5 +52,11 @@ namespace Hashi__bridges_
             GameWindow gameWindow = new GameWindow(18, 21);
             gameWindow.Show();
         }
+        private void HighScoresBtn_Click(object sender, EventArgs e)
+        {
+            TopScoresForm topScoresForm = new TopScoresForm();
+            topScoresForm.Show();
+        }
+
     }
 }
